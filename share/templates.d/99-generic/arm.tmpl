@@ -39,6 +39,20 @@ mkdir ${KERNELDIR}
 # add platform to treeinfo for Beaker support
 treeinfo ${basearch} platforms ${platforms}
 
+## WHeeeeeeee, EFI.
+<% efiargs=""; efigraft=""; efiarch32=None; efiarch64=None %>
+%if exists("boot/efi/EFI/*/gcdarm.efi"):
+    <%
+    efiarch32 = 'ARM'
+    efigraft="EFI/BOOT={0}/EFI/BOOT".format(outroot)
+    images = ["images/efiboot.img"]
+    for img in images:
+        efiargs += " -eltorito-alt-boot -e {0} -no-emul-boot".format(img)
+        efigraft += " {0}={1}/{0}".format(img,outroot)
+    %>
+    <%include file="efi.tmpl" args="configdir=configdir, KERNELDIR=KERNELDIR, efiarch32=efiarch32, efiarch64=efiarch64, isolabel=isolabel"/>
+%endif
+
 # Create optional product.img and updates.img
 <% images=["product", "updates"] %>
 %for img in images:
@@ -56,3 +70,13 @@ treeinfo ${basearch} platforms ${platforms}
 %>
 
 ## FIXME: ARM may need some extra boot config
+
+%if exists("boot/efi/EFI/*/gcdarm.efi"):
+    ## make boot.iso
+    runcmd mkisofs -o ${outroot}/images/boot.iso \
+       ${efiargs} -R -J -V '${isolabel}' -T -graft-points \
+       ${KERNELDIR}=${outroot}/${KERNELDIR} \
+       ${STAGE2IMG}=${outroot}/${STAGE2IMG} \
+       ${efigraft} ${imggraft}
+    treeinfo images-${basearch} boot.iso images/boot.iso
+%endif
