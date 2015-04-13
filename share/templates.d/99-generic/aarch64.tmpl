@@ -31,13 +31,11 @@ mkdir ${KERNELDIR}
     installinitrd images-${basearch} ${kernel.initrd.path} ${KERNELDIR}/initrd.img
 %endfor
 
-#FIXME: this will need adjusted when we have a real bootloader.
 ## WHeeeeeeee, EFI.
-## We could remove the basearch restriction someday..
-<% efiargs=""; efigraft="" %>
+<% efiargs=""; efigraft=""; efiarch32=None; efiarch64=None %>
 %if exists("boot/efi/EFI/*/gcdaa64.efi"):
     <%
-    efiarch = 'AA64'
+    efiarch64 = 'AA64'
     efigraft="EFI/BOOT={0}/EFI/BOOT".format(outroot)
     images = ["images/efiboot.img"]
     %>
@@ -48,7 +46,7 @@ mkdir ${KERNELDIR}
         %>
         treeinfo images-${basearch} ${img|basename} ${img}
     %endfor
-    <%include file="efi.tmpl" args="configdir=configdir, KERNELDIR=KERNELDIR, efiarch=efiarch, isolabel=isolabel"/>
+    <%include file="efi.tmpl" args="configdir=configdir, KERNELDIR=KERNELDIR, efiarch32=efiarch32, efiarch64=efiarch64, isolabel=isolabel"/>
 %endif
 
 # Create optional product.img and updates.img
@@ -76,5 +74,5 @@ runcmd mkisofs -o ${outroot}/images/boot.iso \
        ${KERNELDIR}=${outroot}/${KERNELDIR} \
        ${STAGE2IMG}=${outroot}/${STAGE2IMG} \
        ${efigraft} ${imggraft}
-treeinfo images-${basearch} boot.iso images/boot.iso
+    treeinfo images-${basearch} boot.iso images/boot.iso
 %endif

@@ -48,9 +48,11 @@ kernel-modules
 kernel-modules-extra
 
 memtest86+
-grub2-efi
+grub2-efi-x64
+grub2-efi-ia32
 grub2
-shim
+shim-ia32
+shim-x64
 syslinux
 -dracut-config-rescue
 

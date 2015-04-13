@@ -34,23 +34,37 @@ installpkg glibc-all-langpacks
 
 ## arch-specific packages (bootloaders etc.)
 %if basearch == "aarch64":
-    installpkg efibootmgr grub2-efi grub2-efi-modules grub2-tools shim shim-unsigned
+    installpkg efibootmgr grubby shim
+    installpkg grub2-efi-aa64
 %endif
 %if basearch in ("arm", "armhfp"):
     installpkg kernel-lpae
     installpkg uboot-tools
+    installpkg grub2-efi-arm
 %endif
 %if basearch == "i386":
     installpkg kernel-PAE gpart
 %endif
 %if basearch == "x86_64":
-    installpkg efibootmgr grub2-efi grub2-efi-modules shim shim-unsigned
+    installpkg shim-x64
+    installpkg grub2-efi-x64 grub2-efi-x64-cdboot
+    installpkg grub2-tools-efi
 %endif
 %if basearch in ("i386", "x86_64"):
-    installpkg grub2 grub2-tools memtest86+ syslinux syslinux-nonlinux
+    installpkg efibootmgr
+    installpkg shim-ia32
+    installpkg grub2-efi-ia32 grub2-efi-ia32-cdboot
+    installpkg biosdevname memtest86+ syslinux syslinux-nonlinux
+    installpkg grub2-pc grub2-pc-modules grub2-tools
 %endif
 %if basearch in ("ppc", "ppc64", "ppc64le"):
-    installpkg grub2 grub2-tools fbset hfsutils kernel-bootwrapper ppc64-utils
+    installpkg fbset hfsutils kernel-bootwrapper ppc64-utils
+%endif
+%if basearch == "ppc64":
+    installkpkg grub2-ieee1275
+%endif
+%if basearch == "ppc64le":
+    installkpkg grub2-ppc64le-ieee1275
 %endif
 %if basearch == "s390x":
     installpkg lsscsi s390utils-base s390utils-cmsfs-fuse
